@@ -31,30 +31,54 @@ class AlphaBetaAgent(agent.Agent):
     def go(self, brd):
         """Search for the best move (choice of column for the token)"""
         # Your code here
-        best_move_value = self.min(brd)
+        alpha = -math.inf
+        beta = math.inf
+        best_move_value = self._min(brd, self.max_depth, alpha, beta)
         moves = self.move_dictionary
         for move in moves:
             if move[1] == best_move_value:
                 best_move = move[0]
         return best_move
 
-    def min(self, state):
+    def _min(self, state, depth, alpha, beta):
         """search for the minimum move"""
-        if state.get_outcome() != 0:
+        if state.get_outcome() != 0 or depth == 0:
             return self.utillity(state)
+
+            
         v = float('inf')
         for a in self.get_successors(state):
-            v = min(v, self.max(self.result(state, a)))
+            # v = min(v, self._max(self.result(state, a)))
+
+            new_score = self._max(self.result(state,a), depth-1, alpha, beta)
+            if new_score < v:
+                v = new_score
+                self.move_dictionary.append((a[1], v))
+
+            beta = min(beta, v)
+            if alpha >= beta:
+                break
+        
         return v
 
-    def max(self, state):
+    def _max(self, state, depth, alpha, beta):
         """search for the maximum move"""
-        if state.get_outcome() != 0:
+        if state.get_outcome() != 0 or depth == 0:
             return self.utillity(state)
         v = float('-inf')
         for a in self.get_successors(state):
-            v = max(v, self.min(self.result(state, a)))
-            self.move_dictionary.append((a[1], v))
+            # v = max(v, self.min(self.result(state, a)))
+            # self.move_dictionary.append((a[1], v))
+
+            new_score = self._min(self.result(state,a), depth-1, alpha, beta)
+            if new_score > v:
+                v = new_score
+                self.move_dictionary.append((a[1], v))
+
+            alpha = max(alpha, v)
+            if alpha >= beta:
+                break
+
         return v
 
     def utillity(self, state):
@@ -67,6 +91,7 @@ class AlphaBetaAgent(agent.Agent):
         if outcome != self.player:
             return -1
         return 0
+
 
     def result(self, state, action):
         """return the board after an action"""
@@ -111,8 +136,8 @@ class AlphaBetaAgent(agent.Agent):
 # g = game.Game(4,  # width
 #             6,  # height
 #            4,  # tokens in a row to win
-#           agent.InteractiveAgent("human"),  # player 1
-#          AlphaBetaAgent("alphabeta", 4))  # player 2
+#           agent.RandomAgent("random"), # player 1
+#          AlphaBetaAgent("alphabeta", 4, 2))  # player 2
 # g.board = b
 
 # outcome = g.go()
