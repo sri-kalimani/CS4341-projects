@@ -29,15 +29,18 @@ class AlphaBetaAgent(agent.Agent):
     #
     # NOTE: make sure the column is legal, or you'll lose the game.
     def go(self, brd):
-
+        print(self.move_dictionary, "sdasdas")
         """Search for the best move (choice of column for the token)"""
         # Your code here
 
         if self.player == 1:
             move, _ = self._max(brd, self.max_depth, -math.inf, math.inf)
 
+
         else:
             move, _ = self._min(brd, self.max_depth, -math.inf, math.inf)
+
+
 
 
         return move
@@ -70,7 +73,7 @@ class AlphaBetaAgent(agent.Agent):
             if new_score < v:
                 v = new_score
                 move = a[1]
-                # self.move_dictionary.append((move, v))
+                self.move_dictionary.append((move, v))
 
             beta = min(beta, v)
             if alpha >= beta:
@@ -82,8 +85,7 @@ class AlphaBetaAgent(agent.Agent):
         """search for the maximum move"""
         out = state.get_outcome()
         succ = self.get_successors(state)
-        # if state.get_outcome() != 0 or depth == 0:
-        #     return self.utillity(state)
+
 
         if out == 1:
             return (None,100000000000000)  # An arbitrarily large score for P1
@@ -92,18 +94,17 @@ class AlphaBetaAgent(agent.Agent):
 
 
         if not succ or depth == 0 :
-            #return self.utillity(state)
+
             return (None,self.evaluate(state))
         v = float('-inf')
         for a in succ:
-            # v = max(v, self.min(self.result(state, a)))
-            # self.move_dictionary.append((a[1], v))
+
 
             _,new_score = self._min(a[0], depth-1, alpha, beta)
             if new_score > v:
                 v = new_score
                 move = a[1]
-                # self.move_dictionary.append((move, v))
+                self.move_dictionary.append((move, v))
 
             alpha = max(alpha, v)
             if alpha >= beta:
@@ -140,6 +141,56 @@ class AlphaBetaAgent(agent.Agent):
             # Add board to list of successors
             succ.append((nb, col))
         return succ
+
+    # def scoreN(self,brd, x, y, dx, dy):
+    #     """Returns positive score or negative score for cell starting at (x,y) in direction (dx,dy)"""
+    #     # Avoid out-of-bounds errors
+    #     if ((x + (brd.n - 1) * dx >= brd.w) or
+    #             (y + (brd.n - 1) * dy < 0) or (y + (brd.n - 1) * dy >= brd.h)):
+    #         return 0
+    #     # Get token at (x,y)
+    #     t = brd.board[y][x]
+    #
+    #     # Count number of tokens for a given player
+    #     count = 0
+    #     score  = 0
+    #
+    #     if t != 0:
+    #         count = 1
+    #
+    #     # Go through elements
+    #     for i in range(1, brd.n):
+    #         current = brd.board[y + i * dy][x + i * dx]
+    #
+    #         # If first token is blank, set t to next player token
+    #         if t == 0:
+    #             t = current
+    #
+    #         # Add to count for every token found that is same as token t
+    #         if current == t and t != 0:
+    #             count = count + 1
+    #
+    #
+    #         # If opponent token is found, this area is not useful, return 0
+    #         elif current != 0:
+    #             return 0
+    #
+    #         if count == 4 :
+    #             score += 100
+    #
+    #         elif count == 3 :
+    #             score += 10
+    #         elif count == 2:
+    #             score += 5
+    #
+    #         elif count == 1:
+    #             score += 1
+    #
+    #     # Set count to negative if it's looking at player 2's tokens
+    #     if t == 2:
+    #         score*= -1
+    #
+    #     return score
 
     def scoreN(self,brd, x, y, dx, dy):
         """Returns positive score or negative score for cell starting at (x,y) in direction (dx,dy)"""
@@ -194,19 +245,9 @@ class AlphaBetaAgent(agent.Agent):
 
     def is_terminal_node(self,board):
         return board.get_outcome() or len(self.get_successors(board)) == 0
-# board1 = [[1, 2, 1, 2],
-#         [1, 1, 2, 1],
-#        [1, 1, 0, 0],
-#       [2, 2, 0, 0],
-#      [0, 0, 0, 0],
-#     [0, 0, 0, 0]]
-# b = board.Board(board1, 4, 6, 4)
-# g = game.Game(4,  # width
-#             6,  # height
-#            4,  # tokens in a row to win
-#           agent.RandomAgent("random"), # player 1
-#          AlphaBetaAgent("alphabeta", 4, 2))  # player 2
-# g.board = b
+
+
+
 
 # outcome = g.go()
 THE_AGENT = AlphaBetaAgent("Group13", 4)

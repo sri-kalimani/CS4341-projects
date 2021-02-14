@@ -18,8 +18,8 @@ random.seed(1)
 #
 # Human vs. Random
 #
-# g = game.Game(7, # width
-#               6, # height
+# g = game.Game(4, # width
+#               4, # height
 #               4, # tokens in a row to win
 #               agent.InteractiveAgent("human"),    # player 1
 #               agent.RandomAgent("random"))        # player 2
