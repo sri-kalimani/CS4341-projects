@@ -31,30 +31,67 @@ class AlphaBetaAgent(agent.Agent):
     def go(self, brd):
         """Search for the best move (choice of column for the token)"""
         # Your code here
-        best_move_value = self.min(brd)
+        alpha = -math.inf
+        beta = math.inf
+        if self.player == 1:
+            best_move_value = self._min(brd, self.max_depth, alpha, beta)
+
+        else:
+            best_move_value = self._max(brd, self.max_depth, alpha, beta)
         moves = self.move_dictionary
         for move in moves:
             if move[1] == best_move_value:
                 best_move = move[0]
         return best_move
 
-    def min(self, state):
+
+    def _min(self, state, depth, alpha, beta):
         """search for the minimum move"""
-        if state.get_outcome() != 0:
+        out = state.get_outcome()
+        succ = self.get_successors(state)
+        # if state.get_outcome() != 0 or depth == 0:
+        #     return self.utillity(state)
+        if not succ  or depth == 0:
             return self.utillity(state)
+
+            
         v = float('inf')
-        for a in self.get_successors(state):
-            v = min(v, self.max(self.result(state, a)))
+        for a in succ:
+            # v = min(v, self._max(self.result(state, a)))
+
+            new_score = self._max(a[0], depth-1, alpha, beta)
+            if new_score < v:
+                v = new_score
+                self.move_dictionary.append((a[1], v))
+
+            beta = min(beta, v)
+            if alpha >= beta:
+                break
+        
         return v
 
-    def max(self, state):
+    def _max(self, state, depth, alpha, beta):
         """search for the maximum move"""
-        if state.get_outcome() != 0:
+        out = state.get_outcome()
+        succ = self.get_successors(state)
+        # if state.get_outcome() != 0 or depth == 0:
+        #     return self.utillity(state)
+        if not succ or depth == 0:
             return self.utillity(state)
         v = float('-inf')
-        for a in self.get_successors(state):
-            v = max(v, self.min(self.result(state, a)))
-            self.move_dictionary.append((a[1], v))
+        for a in succ:
+            # v = max(v, self.min(self.result(state, a)))
+            # self.move_dictionary.append((a[1], v))
+
+            new_score = self._min(a[0], depth-1, alpha, beta)
+            if new_score > v:
+                v = new_score
+                self.move_dictionary.append((a[1], v))
+
+            alpha = max(alpha, v)
+            if alpha >= beta:
+                break
+
         return v
 
     def utillity(self, state):
@@ -68,10 +105,11 @@ class AlphaBetaAgent(agent.Agent):
             return -1
         return 0
 
+
     def result(self, state, action):
         """return the board after an action"""
-        moves = self.get_successors(state)
-        for move in moves:
+        succ = self.get_successors(state)
+        for move in succ:
             if move[1] == action[1]:
                 return move[0]
         return 0
@@ -101,6 +139,8 @@ class AlphaBetaAgent(agent.Agent):
             succ.append((nb, col))
         return succ
 
+
+
 # board1 = [[1, 2, 1, 2],
 #         [1, 1, 2, 1],
 #        [1, 1, 0, 0],
@@ -111,8 +151,9 @@ class AlphaBetaAgent(agent.Agent):
 # g = game.Game(4,  # width
 #             6,  # height
 #            4,  # tokens in a row to win
-#           agent.InteractiveAgent("human"),  # player 1
-#          AlphaBetaAgent("alphabeta", 4))  # player 2
+#           agent.RandomAgent("random"), # player 1
+#          AlphaBetaAgent("alphabeta", 4, 2))  # player 2
 # g.board = b
 
 # outcome = g.go()
+THE_AGENT = AlphaBetaAgent("Group13", 4,1)
