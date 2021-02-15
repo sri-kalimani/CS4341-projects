@@ -96,8 +96,7 @@ class AlphaBetaAgent(agent.Agent):
             return (None,self.evaluate(state))
         v = float('-inf')
         for a in succ:
-            # v = max(v, self.min(self.result(state, a)))
-            # self.move_dictionary.append((a[1], v))
+
 
             _,new_score = self._min(a[0], depth-1, alpha, beta)
             if new_score > v:
@@ -174,7 +173,7 @@ class AlphaBetaAgent(agent.Agent):
 
         # Set count to negative if it's looking at player 2's tokens
         if t == 2:
-            count *= -1
+            count *= -100
 
         return count
 
