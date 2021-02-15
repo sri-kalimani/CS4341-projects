@@ -29,21 +29,29 @@ class AlphaBetaAgent(agent.Agent):
     #
     # NOTE: make sure the column is legal, or you'll lose the game.
     def go(self, brd):
-        print(self.move_dictionary, "sdasdas")
+        # print(self.move_dictionary, "move_array")
         """Search for the best move (choice of column for the token)"""
         # Your code here
 
         if self.player == 1:
-            move, _ = self._max(brd, self.max_depth, -math.inf, math.inf)
+            move, score = self._max(brd, self.max_depth, -math.inf, math.inf)
+            moves = self.move_dictionary
+            for m in moves:
+                if m[1] == score:
+                    return move
 
 
         else:
-            move, _ = self._min(brd, self.max_depth, -math.inf, math.inf)
+            move, score = self._min(brd, self.max_depth, -math.inf, math.inf)
+            moves = self.move_dictionary
+            for m in moves:
+                if m[1] == score:
+                    return move
 
 
 
 
-        return move
+
 
 
 
@@ -142,67 +150,19 @@ class AlphaBetaAgent(agent.Agent):
             succ.append((nb, col))
         return succ
 
-    # def scoreN(self,brd, x, y, dx, dy):
-    #     """Returns positive score or negative score for cell starting at (x,y) in direction (dx,dy)"""
-    #     # Avoid out-of-bounds errors
-    #     if ((x + (brd.n - 1) * dx >= brd.w) or
-    #             (y + (brd.n - 1) * dy < 0) or (y + (brd.n - 1) * dy >= brd.h)):
-    #         return 0
-    #     # Get token at (x,y)
-    #     t = brd.board[y][x]
-    #
-    #     # Count number of tokens for a given player
-    #     count = 0
-    #     score  = 0
-    #
-    #     if t != 0:
-    #         count = 1
-    #
-    #     # Go through elements
-    #     for i in range(1, brd.n):
-    #         current = brd.board[y + i * dy][x + i * dx]
-    #
-    #         # If first token is blank, set t to next player token
-    #         if t == 0:
-    #             t = current
-    #
-    #         # Add to count for every token found that is same as token t
-    #         if current == t and t != 0:
-    #             count = count + 1
-    #
-    #
-    #         # If opponent token is found, this area is not useful, return 0
-    #         elif current != 0:
-    #             return 0
-    #
-    #         if count == 4 :
-    #             score += 100
-    #
-    #         elif count == 3 :
-    #             score += 10
-    #         elif count == 2:
-    #             score += 5
-    #
-    #         elif count == 1:
-    #             score += 1
-    #
-    #     # Set count to negative if it's looking at player 2's tokens
-    #     if t == 2:
-    #         score*= -1
-    #
-    #     return score
+
 
     def scoreN(self,brd, x, y, dx, dy):
         """Returns positive score or negative score for cell starting at (x,y) in direction (dx,dy)"""
-        # Avoid out-of-bounds errors
+        # checking for boundaries
         if ((x + (brd.n - 1) * dx >= brd.w) or
                 (y + (brd.n - 1) * dy < 0) or (y + (brd.n - 1) * dy >= brd.h)):
             return 0
-        # Get token at (x,y)
+        # token
         t = brd.board[y][x]
-
-        # Count number of tokens for a given player
+        # Counting # of consecutive tokens
         count = 0
+        score = 0
 
         if t != 0:
             count = 1
@@ -225,7 +185,9 @@ class AlphaBetaAgent(agent.Agent):
 
         # Set count to negative if it's looking at player 2's tokens
         if t == 2:
-            count *= -100
+            count *= -1
+
+
 
         return count
 
