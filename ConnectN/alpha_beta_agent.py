@@ -21,7 +21,6 @@ class AlphaBetaAgent(agent.Agent):
         self.max_depth = max_depth
         self.move_dictionary = []
 
-
     # Pick a column.
     #
     # PARAM [board.Board] brd: the current board state
@@ -32,28 +31,11 @@ class AlphaBetaAgent(agent.Agent):
         # print(self.move_dictionary, "move_array")
         """Search for the best move (choice of column for the token)"""
         # Your code here
-
-        if self.player == 1:
-            move, score = self._max(brd, self.max_depth, -math.inf, math.inf)
-            moves = self.move_dictionary
-            for m in moves:
-                if m[1] == score:
-                    return move
-
-
-        else:
-            move, score = self._min(brd, self.max_depth, -math.inf, math.inf)
-            moves = self.move_dictionary
-            for m in moves:
-                if m[1] == score:
-                    return move
-
-
-
-
-
-
-
+        move, score = self._max(brd, self.max_depth, -math.inf, math.inf)
+        moves = self.move_dictionary
+        for m in moves:
+            if m[1] == score:
+                return move
 
 
     def _min(self, state, depth, alpha, beta):
@@ -61,23 +43,20 @@ class AlphaBetaAgent(agent.Agent):
         out = state.get_outcome()
         succ = self.get_successors(state)
 
-        if out == 1:
-            return (None,100000000000000)  # An arbitrarily large score for P1
-        elif out == 2:
-            return (None,-100000000000000)  # An equally arbitrarily large score for P2
+        if out == self.player:
+            return (None, 100000000000000)  # An arbitrarily large score for P1
+        elif out != self.player and out != 0:
+            return (None, -100000000000000)  # An equally arbitrarily large score for P2
 
-
-
-        if not succ  or depth == 0 :
+        if not succ or depth == 0:
             # return self.utillity(state)
-            return (None,self.evaluate(state))
-
+            return (None, self.evaluate(state))
 
         v = float('inf')
         for a in succ:
             # v = min(v, self._max(self.result(state, a)))
 
-            _,new_score = self._max(a[0], depth-1, alpha, beta)
+            _, new_score = self._max(a[0], depth - 1, alpha, beta)
             if new_score < v:
                 v = new_score
                 move = a[1]
@@ -87,28 +66,24 @@ class AlphaBetaAgent(agent.Agent):
             if alpha >= beta:
                 break
 
-        return (move,v)
+        return (move, v)
 
     def _max(self, state, depth, alpha, beta):
         """search for the maximum move"""
         out = state.get_outcome()
         succ = self.get_successors(state)
 
+        if out == self.player:
+            return (None, 100000000000000)  # An arbitrarily large score for P1
+        elif out != self.player and out != 0:
+            return (None, -100000000000000)  # An equally arbitrarily large score for P2
 
-        if out == 1:
-            return (None,100000000000000)  # An arbitrarily large score for P1
-        elif out == 2:
-            return (None,-100000000000000)  # An equally arbitrarily large score for P2
-
-
-        if not succ or depth == 0 :
-
-            return (None,self.evaluate(state))
+        if not succ or depth == 0:
+            return (None, self.evaluate(state))
         v = float('-inf')
         for a in succ:
 
-
-            _,new_score = self._min(a[0], depth-1, alpha, beta)
+            _, new_score = self._min(a[0], depth - 1, alpha, beta)
             if new_score > v:
                 v = new_score
                 move = a[1]
@@ -118,12 +93,7 @@ class AlphaBetaAgent(agent.Agent):
             if alpha >= beta:
                 break
 
-        return (move,v)
-
-
-
-
-
+        return (move, v)
 
     # Get the successors of the given board.
     #
@@ -150,9 +120,7 @@ class AlphaBetaAgent(agent.Agent):
             succ.append((nb, col))
         return succ
 
-
-
-    def scoreN(self,brd, x, y, dx, dy):
+    def scoreN(self, brd, x, y, dx, dy):
         """Returns positive score or negative score for cell starting at (x,y) in direction (dx,dy)"""
         # checking for boundaries
         if ((x + (brd.n - 1) * dx >= brd.w) or
@@ -184,14 +152,12 @@ class AlphaBetaAgent(agent.Agent):
                 return 0
 
         # Set count to negative if it's looking at player 2's tokens
-        if t == 2:
+        if t != self.player:
             count *= -1
-
-
 
         return count
 
-    def evaluate(self,brd):
+    def evaluate(self, brd):
         score = 0
 
         # Check each cell in board
@@ -205,10 +171,8 @@ class AlphaBetaAgent(agent.Agent):
 
         return score
 
-    def is_terminal_node(self,board):
+    def is_terminal_node(self, board):
         return board.get_outcome() or len(self.get_successors(board)) == 0
-
-
 
 
 # outcome = g.go()
