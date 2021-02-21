@@ -21,7 +21,6 @@ class AlphaBetaAgent(agent.Agent):
         self.max_depth = max_depth
         self.move_dictionary = []
 
-
     # Pick a column.
     #
     # PARAM [board.Board] brd: the current board state
@@ -32,53 +31,29 @@ class AlphaBetaAgent(agent.Agent):
         # print(self.move_dictionary, "move_array")
         """Search for the best move (choice of column for the token)"""
         # Your code here
-
-        if self.player == 1:
-            move, score = self._max(brd, self.max_depth, -math.inf, math.inf)
-            moves = self.move_dictionary
-            for m in moves:
-                if m[1] == score:
-                    return move
-
-
-        else:
-            move, score = self._min(brd, self.max_depth, -math.inf, math.inf)
-            moves = self.move_dictionary
-            for m in moves:
-                if m[1] == score:
-                    return move
-
-
-
-
-
-
-
-
+        move, score = self._max(brd, self.max_depth, -math.inf, math.inf)
+        moves = self.move_dictionary
+        for m in moves:
+            if m[1] == score:
+                return move
 
     def _min(self, state, depth, alpha, beta):
         """search for the minimum move"""
-        out = state.get_outcome()
+        out = state.get_outcome()  # getting the outcome of the game
         succ = self.get_successors(state)
 
-        if out == 1:
-            return (None,100000000000000)  # An arbitrarily large score for P1
-        elif out == 2:
-            return (None,-100000000000000)  # An equally arbitrarily large score for P2
+        if out == self.player:  # if we won the game
+            return (None, 100000000000000)
+        elif out != self.player and out != 0:
+            return (None, -100000000000000)  # if we lost the game
 
-
-
-        if not succ  or depth == 0 :
-            # return self.utillity(state)
-            return (None,self.evaluate(state))
-
+        if not succ or depth == 0:  # if there are no successors or depth is 0 then we are looking at terminal nodes
+            return (None, self.evaluate(state))
 
         v = float('inf')
         for a in succ:
-            # v = min(v, self._max(self.result(state, a)))
-
-            _,new_score = self._max(a[0], depth-1, alpha, beta)
-            if new_score < v:
+            _, new_score = self._max(a[0], depth - 1, alpha, beta)
+            if new_score < v:  # if new score is better, add it to our move dictionary
                 v = new_score
                 move = a[1]
                 self.move_dictionary.append((move, v))
@@ -87,28 +62,24 @@ class AlphaBetaAgent(agent.Agent):
             if alpha >= beta:
                 break
 
-        return (move,v)
+        return (move, v)
 
     def _max(self, state, depth, alpha, beta):
         """search for the maximum move"""
         out = state.get_outcome()
         succ = self.get_successors(state)
 
+        if out == self.player:
+            return (None, 100000000000000)  # if we won the game
+        elif out != self.player and out != 0:
+            return (None, -100000000000000)  # if we lost the game
 
-        if out == 1:
-            return (None,100000000000000)  # An arbitrarily large score for P1
-        elif out == 2:
-            return (None,-100000000000000)  # An equally arbitrarily large score for P2
-
-
-        if not succ or depth == 0 :
-
-            return (None,self.evaluate(state))
+        if not succ or depth == 0:  # if there are no successors or depth is 0 then we are looking at terminal nodes
+            return (None, self.evaluate(state))
         v = float('-inf')
         for a in succ:
 
-
-            _,new_score = self._min(a[0], depth-1, alpha, beta)
+            _, new_score = self._min(a[0], depth - 1, alpha, beta)
             if new_score > v:
                 v = new_score
                 move = a[1]
@@ -118,12 +89,7 @@ class AlphaBetaAgent(agent.Agent):
             if alpha >= beta:
                 break
 
-        return (move,v)
-
-
-
-
-
+        return (move, v)
 
     # Get the successors of the given board.
     #
@@ -150,65 +116,52 @@ class AlphaBetaAgent(agent.Agent):
             succ.append((nb, col))
         return succ
 
-
-
-    def scoreN(self,brd, x, y, dx, dy):
+    def utillity(self, brd, x, y, dx, dy):
         """Returns positive score or negative score for cell starting at (x,y) in direction (dx,dy)"""
         # checking for boundaries
-        if ((x + (brd.n - 1) * dx >= brd.w) or
-                (y + (brd.n - 1) * dy < 0) or (y + (brd.n - 1) * dy >= brd.h)):
-            return 0
-        # token
-        t = brd.board[y][x]
+        if ((x + (brd.n - 1) * dx >= brd.w) or (y + (brd.n - 1) * dy < 0) or (y + (brd.n - 1) * dy >= brd.h)): return 0
+        t = brd.board[y][x]  # token
         # Counting # of consecutive tokens
         count = 0
-        score = 0
-
         if t != 0:
             count = 1
 
-        # Go through elements
+        # Going through elements
         for i in range(1, brd.n):
             current = brd.board[y + i * dy][x + i * dx]
 
-            # If first token is blank, set t to next player token
+            # If we the cell is blank then set t to be the token we are looking at
             if t == 0:
                 t = current
 
-            # Add to count for every token found that is same as token t
+            # Count then number of consecutive tokens
             if current == t and t != 0:
                 count = count + 1
 
-            # If opponent token is found, this area is not useful, return 0
-            elif current != 0:
-                return 0
+            # if different token is found, stop counting and return 0
+            elif current != 0:return 0
 
-        # Set count to negative if it's looking at player 2's tokens
-        if t == 2:
+        # If we counted oponent's tokens then multiply count by -1
+        if t != self.player:
             count *= -1
-
-
 
         return count
 
-    def evaluate(self,brd):
+    def evaluate(self, brd):
         score = 0
 
-        # Check each cell in board
+        # go through each cell, evaluate every move by assigning score
         for x in range(brd.w):
             for y in range(brd.h):
-                # Sum score for cell and direction
-                score += self.scoreN(brd, x, y, 1, 0)
-                score += self.scoreN(brd, x, y, 0, 1)
-                score += self.scoreN(brd, x, y, 1, 1)
-                score += self.scoreN(brd, x, y, 1, -1)
+                score += self.utillity(brd, x, y, 1, 0)
+                score += self.utillity(brd, x, y, 0, 1)
+                score += self.utillity(brd, x, y, 1, 1)
+                score += self.utillity(brd, x, y, 1, -1)
 
         return score
 
-    def is_terminal_node(self,board):
+    def is_terminal_node(self, board):
         return board.get_outcome() or len(self.get_successors(board)) == 0
-
-
 
 
 # outcome = g.go()
