@@ -141,7 +141,7 @@ class AlphaBetaAgent(agent.Agent):
             # if different token is found, stop counting and return 0
             elif current != 0:return 0
 
-        # If we counted oponent's tokens then multiply count by -1
+        # If we counted opponent's tokens then multiply count by -1
         if t != self.player:
             count *= -1
 
