@@ -32,6 +32,14 @@ g.add_character(InteractiveCharacter("me", # name
                                      0, 0  # position
 ))
 
+
+# Uncomment this if you want the interactive character
+# g.add_character(InteractiveCharacter("me", # name
+#                                      "C",  # avatar
+#                                      0, 0  # position
+# ))
+
+
 # Run!
 
 # Use this if you want to press ENTER to continue at each step
