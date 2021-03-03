@@ -18,15 +18,17 @@ class TestCharacter(CharacterEntity):
         to move in to a cell: check if empty, and no wall
         '''
 
-        # print("EXIT = ", wr)
+        print("EXIT = ", wrld.exitcell)
         path = astar.AStar(wrld, (0,0), wrld.exitcell)
         cell = path.pop(0)
 
 
-        while cell != wrld.exitcell:
-            print("Cell: ", cell)
+        while path:
+            print("Cell: ", cell, wrld.wall_at(cell[0], cell[1]))
+
             self.move(cell[0], cell[1])
             cell = path.pop(0)
+
 
 
         # pass

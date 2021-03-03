@@ -23,19 +23,20 @@ def AStar(wrld, start, dest):
 
     while not frontier.empty():
         cur = (frontier.get())[1]
-        # print("Currently seatchng: ", cur)
-
+        
         # If we're at the destination.
         if cur == dest:            
-            cur = dest
+
+            # Find path
             while cur != start:
                 path.insert(0, cur)
                 cur = cameFrom[cur]
-
+            path.insert(0, start)
             return path
+        
         # Otherwise touch all neighbors
         for i in neighbors(wrld, cur):
-            # print()
+
             # Tentative cost is the path to current plus 1 because all cells are identical
             cost = g[cur] + 1
 
