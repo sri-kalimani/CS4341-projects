@@ -6,6 +6,7 @@ sys.path.insert(0, '../bomberman')
 from entity import CharacterEntity
 from colorama import Fore, Back
 from astar import *
+import copy
 
 class Agent(CharacterEntity):
     def __init__(self, name, avatar, x, y):
@@ -45,4 +46,40 @@ class Agent(CharacterEntity):
 
     # Adapted from RedBlobGames
 
+    # expectimax
+    def expectimax(self, world):
+        
 
+        pass
+
+    def utility(self, world):
+        pass
+
+    def getStates(self, world):
+        # gets all terminal states for a given current configuration
+        # states are a combination of: bomberman location, monster loc
+        # make copies of world, iteratively change both locations
+
+        # if at exit, return
+        if (self.x, self.y) == world.exitcell:
+            return []
+
+        succ = []
+        
+        # Copy of current character state
+        char_copy = copy.deepcopy(self)
+
+        # Copy of current world state
+        # w_copy = copy.deepcopy(world)
+
+        for i in range(world.width()):
+            for j in range(world.height()):
+                char_copy.move(i - char_copy.x, j - char_copy.y)
+                succ.append(char_copy)
+            
+
+        return succ
+                
+                
+                
+                
