@@ -14,7 +14,7 @@ sys.path.insert(1, '../groupNN')
 
 # Uncomment this if you want the interactive character
 from interactivecharacter import InteractiveCharacter
-from AI import Agent
+from stupid_AI import Agent
 
 # Create the game
 g = Game.fromfile('map.txt')
@@ -22,10 +22,8 @@ g = Game.fromfile('map.txt')
 # TODO Add your character
 
 # Uncomment this if you want the test character
-g.add_character(Agent("Chut", # name
-                              "C",  # avatar
-                              0, 0  # position
-))
+g.add_character(Agent("Chut",  "C", 0,0))
+
 
 # Uncomment this if you want the interactive character
 # g.add_character(InteractiveCharacter("me", # name

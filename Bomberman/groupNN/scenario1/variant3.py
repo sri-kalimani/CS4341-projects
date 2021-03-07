@@ -10,7 +10,7 @@ from monsters.selfpreserving_monster import SelfPreservingMonster
 
 # TODO This is your code!
 sys.path.insert(1, '../groupNN')
-from AI import Agent
+from stupid_AI import Agent
 
 # Create the game
 random.seed(123) # TODO Change this if you want different random choices

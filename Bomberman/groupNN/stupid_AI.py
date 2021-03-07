@@ -5,16 +5,20 @@ sys.path.insert(0, '../bomberman')
 # Import necessary stuff
 from entity import CharacterEntity
 from colorama import Fore, Back
-from astar import *
+from helper import *
 
 class Agent(CharacterEntity):
-    def __init__(self, name, avatar, x, y):
+    def __init__(self, name, avatar, x, y,):
         CharacterEntity.__init__(self, name, avatar, x, y)
         self.exit = None
         self.bombed = None
         self.tiles = {}
 
+
     def do(self, world):
+
+
+
         if self.exit is None:
             for x in range(world.width()):
                 for y in range(world.height()):
@@ -43,6 +47,6 @@ class Agent(CharacterEntity):
             self.bombed = (self.x, self.y)
             self.move(next_cell[0] - self.x, next_cell[1] - self.y)
 
-    # Adapted from RedBlobGames
+
 
 

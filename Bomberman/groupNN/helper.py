@@ -34,9 +34,9 @@ def Astar(wrld, start, dest):
             if wrld.wall_at(next_cell[0], next_cell[1]):
                 for dir2 in [(1, 0), (1, 1), (1, -1), (-1, 0), (-1, 1), (-1, -1), (0, -1), (0, 1)]:
                     if wrld.bomb_at(next_cell[0] + dir2[0], next_cell[1] + dir2[1]):
-                        cost = 120
+                        cost = 100
                     else:
-                        cost = 120
+                        cost = 100
             elif wrld.explosion_at(next_cell[0], next_cell[1]):
                 cost = math.inf
             elif wrld.monsters_at(next_cell[0], next_cell[1]):
@@ -58,7 +58,7 @@ def Astar(wrld, start, dest):
             new_cost = g[curr] + cost
             if next_cell not in g or new_cost < g[next_cell]:
                 g[next_cell] = new_cost
-                priority = new_cost + heuristic(dest, next_cell)
+                priority = new_cost +Distance(dest, next_cell)
                 frontier.put(next_cell, priority)
                 cameFrom[next_cell] = curr
     curr = dest
@@ -70,14 +70,50 @@ def Astar(wrld, start, dest):
     path.reverse()
     return path
 
+def isWall( x, y, wrld):
+    if (x > 0 and x < wrld.width()):
+        if (y > 0 and y < wrld.height()):
+            if not wrld.wall_at(x, y):
+                return True
+    return False
 
-def heuristic(a, b):
-    # Manhattan distance - minimum number of cells to get from a to b
-    (x1, y1) = a
-    (x2, y2) = b
-    return abs(x1 - x2) + abs(y1 - y2)
+
+def inRange( x, y, wrld):
+    if (x > 0 and x < wrld.width()):
+        if (y > 0 and y < wrld.height()):
+            return True
+    return False
 
 
+# distance to bomb
+def bomb_distance( x, y, wrld):
+    distance = 0
+    for dx in range(-5,10):
+        if inRange(x + dx, y, wrld):
+            if wrld.bomb_at(x + dx, y):
+                distance = abs(dx)
+    for dy in range(-5, 10):
+        if inRange(x, y + dy, wrld):
+            if wrld.bomb_at(x, y + dy):
+                distance = abs(dy)
+
+
+    return distance
+
+
+
+
+
+# distance bettween agent and monster
+def monster_distance( ai, mo):
+    x1, y1 = ai
+    x2, y2 = mo
+
+    d = sqrt((abs(x2 - x1) * abs(y2 - y1)) + (abs(x2 - x1) * abs(y2 - y1)))
+    print(d,"distance")
+    if (d == 0):
+        return 1
+    return 2/d
 
 
 
@@ -99,3 +135,12 @@ def neighbors(wrld, curr):
                         neighbors.append((curr[0] + dx, curr[1] + dy))
     return neighbors
 
+
+def isEmpty( x, y, wrld):
+    empty = 0
+    for dx in range(-1, 2, 1):
+        for dy in range(-1, 2, 1):
+            if (inRange(x + dx, y + dy, wrld)):
+                if (wrld.empty_at(x + dx, y + dy)):
+                    empty += 1
+    return empty
