@@ -44,8 +44,8 @@ class Agent(CharacterEntity):
                         self.state = State.RANDOM
                     if world.monsters.get(world.index(x, y)) == SelfPreservingMonster:
                         self.state = State.AGGRESSIVE
-                    if world.monsters.get(world.index(x, y)) == StupidMonster and world.monsters.get(
-                            world.index(x, y)) == SelfPreservingMonster:
+                    if (world.monsters.get(world.index(x, y)) == StupidMonster and self.state == State.AGGRESSIVE) or \
+                            (world.monsters.get(world.index(x, y)) == SelfPreservingMonster and self.state == State.RANDOM):
                         self.state = State.RANAGGER
 
         # change behavior depending on state
