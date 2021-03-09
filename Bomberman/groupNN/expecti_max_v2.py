@@ -1,4 +1,3 @@
-
 import sys
 import random
 import math
@@ -13,36 +12,33 @@ from helper import *
 import random
 
 
-
-
 class AI(CharacterEntity):
     def __init__(self, name, avatar, x, y, ):
         CharacterEntity.__init__(self, name, avatar, x, y)
         self.bomb_timer = 0
         self.loc = []
 
-
     # avoid mosnter
     def avoid_mon(self, wrld, p):
-        monsta,distance = 0,0
+        monsta, distance = 0, 0
         monsters_array = []
 
-        m1,m2 = p[0], p[1]
+        m1, m2 = p[0], p[1]
 
         for x in range(wrld.width()):
             for y in range(wrld.height()):
                 monsters = wrld.monsters_at(x, y)
-                if monsters: # look for monsters around
+                if monsters:  # look for monsters around
                     for mon in monsters:
                         monsters_array.append((mon, (x, y)))
         for mon in monsters_array:
 
             if (monsta == 0):
                 monsta = mon
-                
-                distance = sqrt((m1 - mon[1][0])**2 + (m2 - mon[1][1])**2)
+
+                distance = sqrt((m1 - mon[1][0]) ** 2 + (m2 - mon[1][1]) ** 2)
             else:
-                dis = sqrt((m1 - mon[1][0])**2 + (m2 - mon[1][1])**2)
+                dis = sqrt((m1 - mon[1][0]) ** 2 + (m2 - mon[1][1]) ** 2)
                 if dis < distance:
                     monsta = mon
                     distance = dis
@@ -82,11 +78,10 @@ class AI(CharacterEntity):
         if isEmpty(x, y, wrld) < 5:
             reward -= 100
 
-
         if bomb_distance(x, y, wrld) > 0:
             reward -= (8 / bomb_distance(x, y, wrld)) * 1000000
         if wrld.bomb_at(x, y) is not None:
-            if wrld.bomb_at(x, y).timer <= 5:
+            if wrld.bomb_at(x, y).timer <= 10:
                 reward -= 10000
 
         if wrld.exit_at(x, y):
@@ -96,8 +91,6 @@ class AI(CharacterEntity):
             reward -= 10000000000000000000
 
         return reward
-
-       
 
     def maxValue(self, wrld, val, level):
         if level >= 1:
@@ -127,7 +120,6 @@ class AI(CharacterEntity):
             value = value + ((pb) * self.maxValue(vals[0], val, level + 1))
         return value
 
-
     def expectimax_search(self, wrld):
         # for Event in event:
         c_level = 0
@@ -135,11 +127,10 @@ class AI(CharacterEntity):
         current_val = -math.inf
         max_val = -math.inf
 
-
         for wrld, val in self.cell(wrld):
             newWorld = SensedWorld.from_world(wrld)
             character = newWorld.me(self)
-            character.x ,character.y = val[0],val[1]
+            character.x, character.y = val[0], val[1]
 
             current_val = max(current_val, self.expValue(wrld, val, c_level + 1))
             if current_val > max_val:
@@ -148,17 +139,12 @@ class AI(CharacterEntity):
 
         return search_result
 
- 
-
-
     def boom(self, wrld):
         for x in range(wrld.width()):
             for y in range(wrld.height()):
                 if wrld.explosion_at(x, y):
                     return True
         return False
-
-
 
     # 8 near safe cells
     def cell(self, brd):
@@ -183,13 +169,12 @@ class AI(CharacterEntity):
 
         return cells
 
-
     def monAction(self, wrld, loc):
         cells = []
         x, y = loc
 
         for action in [(x, y - 1), (x, y + 1), (x + 1, y - 1), (x - 1, y), (x + 1, y), (x - 1, y + 1), (x + 1, y + 1),
-                      (x - 1, y - 1)]:
+                       (x - 1, y - 1)]:
 
             if isWall(action[0], action[1], wrld):
                 newWorld = SensedWorld.from_world(wrld)
@@ -199,12 +184,9 @@ class AI(CharacterEntity):
 
         return cells
 
-
-
     def do(self, wrld):
 
         bomb = self.boom(wrld)
-
 
         if self.loc == []:
             self.loc = [[0] * wrld.height() for _ in range(wrld.width())]
@@ -216,7 +198,6 @@ class AI(CharacterEntity):
         self.place_bomb()
 
         if self.bomb_timer == 3:
-
             self.bomb_timer = 0
 
         move = self.expectimax_search(wrld)
