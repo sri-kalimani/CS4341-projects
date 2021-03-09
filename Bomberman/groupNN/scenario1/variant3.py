@@ -9,7 +9,7 @@ from game import Game
 from monsters.selfpreserving_monster import SelfPreservingMonster
 
 # TODO This is your code!
-sys.path.insert(1, '../groupNN')
+sys.path.insert(1, '../group13')
 from stupid_AI import Agent
 
 # Create the game
