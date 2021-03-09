@@ -7,18 +7,18 @@ sys.path.insert(1, '..')
 from game import Game
 
 # TODO This is your code!
-sys.path.insert(1, '../groupNN')
-from testcharacter import TestCharacter
+sys.path.insert(1, '../group13')
+from expecti_max_AI import AI
 
 
 # Create the game
 g = Game.fromfile('map.txt')
 
 # TODO Add your character
-# g.add_character(TestCharacter("me", # name
-#                               "C",  # avatar
-#                               0, 0  # position
-# ))
+g.add_character(AI("Chut", # name
+                              "C",  # avatar
+                              0, 0  # position
+))
 
 # Run!
-g.go()
+g.go(1)
