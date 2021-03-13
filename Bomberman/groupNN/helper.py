@@ -7,6 +7,26 @@ from math import sqrt
 def Distance(a, b):
     return sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
+# absolute distance between tuples
+def distance( a, b):
+    (x1, y1) = a
+    (x2, y2) = b
+    d = abs(x1 - x2) + abs(y1 - y2)
+
+    return d
+
+# distance bettween agent and monster
+def monster_distance( ai, mo):
+    x1, y1 = ai
+    x2, y2 = mo
+
+    d = sqrt((abs(x2 - x1) * abs(y2 - y1)) + (abs(x2 - x1) * abs(y2 - y1)))
+    print(d,"distance")
+    if (d == 0):
+        return 1
+    return 2/d
+
+
 # A*
 #
 # PARAM [wrld] wrld: The curr game state.
@@ -70,6 +90,9 @@ def Astar(wrld, start, dest):
     path.reverse()
     return path
 
+
+
+
 def isWall( x, y, wrld):
     if (x > 0 and x < wrld.width()):
         if (y > 0 and y < wrld.height()):
@@ -78,9 +101,42 @@ def isWall( x, y, wrld):
     return False
 
 
+# go through cells and assign scores
+def score_cell(wrld, loc):
+    x = loc[0]
+    y = loc[1]
+    # Go through neighboring cells
+    count = 0
+
+    for dx in [-2, 0, 2]:
+        #  out-of-bounds
+        if not ((x + dx >= 0) or not (x + dx < wrld.width())):
+            count += 2
+        if (x + dx >= 0) and (x + dx < wrld.width()):
+            for dy in [-2, 0, 2]:
+                # out-of-bounds
+                if not ((y + dy >= 0) or not (y + dy < wrld.height())):
+                    count += 2
+                if (y + dy >= 0) and (y + dy < wrld.height()):
+                    # Is this cell any good?
+                    if wrld.wall_at(x + dx, y + dy):
+                        count += 1
+
+
+    return count
+
 def inRange( x, y, wrld):
     if (x > 0 and x < wrld.width()):
         if (y > 0 and y < wrld.height()):
+            return True
+    return False
+
+def mon_inRange(x,y ,wrld):
+    for i in range(-4, 5):
+        if wrld.monsters_at(x + i, y):
+            return True
+    for j in range(-4, 5):
+        if wrld.monsters_at(x, y + j):
             return True
     return False
 
@@ -102,39 +158,47 @@ def bomb_distance( x, y, wrld):
 
 
 
+# returns all valid neighbors
+def neighbors2( wrld, x, y):
 
+    cells = []
 
-# distance bettween agent and monster
-def monster_distance( ai, mo):
-    x1, y1 = ai
-    x2, y2 = mo
+    for dx in [-1, 0, 1]:
 
-    d = sqrt((abs(x2 - x1) * abs(y2 - y1)) + (abs(x2 - x1) * abs(y2 - y1)))
-    print(d,"distance")
-    if (d == 0):
-        return 1
-    return 2/d
+        if ((x + dx >= 0) and (x + dx < wrld.width())):
+            for dy in [-1, 0, 1]:
 
+                if ((y + dy >= 0) and (y + dy < wrld.height())):
 
+                    if not wrld.explosion_at(x + dx, y + dy):
+                        cells.append((x + dx, y + dy))
 
+    return cells
+
+def boom(wrld):
+    for x in range(wrld.width()):
+        for y in range(wrld.height()):
+            if wrld.explosion_at(x, y):
+                return True
+    return False
 
 
 def neighbors(wrld, curr):
     neighbors = [curr]
 
-    # Loop through x directions
     for dx in [-1, 0, 1]:
-        # Check that x coordinate is within grid
         if (curr[0] + dx >= 0) and (curr[0] + dx < wrld.width()):
-            # Loop through y directions
             for dy in [-1, 0, 1]:
-                # Check that y coordinate is within grid
                 if (curr[1] + dy >= 0) and (curr[1] + dy < wrld.height()):
-                    # Add to list of neighbors if new cell is not a wall
                     if not wrld.wall_at(curr[0] + dx, curr[1] + dy):
                         neighbors.append((curr[0] + dx, curr[1] + dy))
     return neighbors
-
+# function to check if a cell will explode next turn
+def exp(f ,x, y,loc):
+    if (f <= 2) and f != -1:
+        if (x, y) in loc:
+            return True
+    return False
 
 def isEmpty( x, y, wrld):
     empty = 0
@@ -144,3 +208,65 @@ def isEmpty( x, y, wrld):
                 if (wrld.empty_at(x + dx, y + dy)):
                     empty += 1
     return empty
+
+# return a list of neighbors that are valid moves and don't kill you
+def isEmpty2(f,x,y, wrld,loc):
+    cells = []
+    for dx in [-1, 0, 1]:
+        if (x + dx >= 0) and (x + dx < wrld.width()):
+            for dy in [-1, 0, 1]:
+                # Avoid out-of-bounds access
+                if ((y + dy >= 0) and (y + dy < wrld.height())):
+                    # Is this cell walkable?
+                    if not wrld.wall_at(x + dx, y + dy) and not exp(f,x + dx, y + dy,loc) and not wrld.monsters_at(x + dx, y + dy) and not wrld.explosion_at(x + dx, y + dy):
+                        cells.append((dx, dy))
+                        # All done
+    return cells
+
+# return true if a monster is present within a certain radius of a location
+def isMon(wrld, x, y, r):
+    # Go through neighboring cells
+    for dx in range(-r, r):
+        # Avoid out-of-bounds access
+        if ((x + dx >= 0) and (x + dx < wrld.width())):
+            for dy in range(-r, r):
+                # Avoid out-of-bounds access
+                if ((y + dy >= 0) and (y + dy < wrld.height())):
+
+                    if wrld.monsters_at(x + dx, y + dy):
+
+                        return True
+    return False
+
+
+# Returns x, y coordinate of monster
+def monCoor( wrld, x, y, radius):
+    for dx in range(-radius, radius):
+        if ((x + dx >= 0) and (x + dx < wrld.width())):
+            for dy in range(-radius, radius):
+                if ((y + dy >= 0) and (y + dy < wrld.height())):
+                    if wrld.monsters_at(x + dx, y + dy):
+                        return (x + dx, y + dy)
+
+
+class PriorityQueue():
+    def __init__(self):
+        self.queue = []
+
+
+    def empty(self):
+        if self.size() != 0:
+            return False
+        else:
+            return True
+
+    def size(self):
+        return len(self.queue)
+
+    def put(self, data, priority):
+        self.queue.append((priority, data))
+        self.queue.sort()
+
+    def get(self):
+        if not self.empty():
+            return self.queue.pop(0)

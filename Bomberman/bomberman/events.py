@@ -24,4 +24,6 @@ class Event:
         if self.tpe == self.CHARACTER_KILLED_BY_MONSTER:
             return self.character.name + " was killed by " + self.other.name
         if self.tpe == self.CHARACTER_FOUND_EXIT:
+            with open("test.txt", "a") as f:
+                f.write("found exit\n")
             return self.character.name + " found the exit"

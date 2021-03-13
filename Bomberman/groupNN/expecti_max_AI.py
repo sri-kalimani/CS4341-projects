@@ -90,6 +90,7 @@ class AI(CharacterEntity):
                 reward -= 10000
 
         if wrld.exit_at(x, y):
+
             reward += 10000000000000000
 
         if wrld.explosion_at(x, y) is not None:
@@ -151,12 +152,7 @@ class AI(CharacterEntity):
  
 
 
-    def boom(self, wrld):
-        for x in range(wrld.width()):
-            for y in range(wrld.height()):
-                if wrld.explosion_at(x, y):
-                    return True
-        return False
+    
 
 
 
@@ -203,7 +199,7 @@ class AI(CharacterEntity):
 
     def do(self, wrld):
 
-        bomb = self.boom(wrld)
+        bomb = boom(wrld)
 
 
         if self.loc == []:
