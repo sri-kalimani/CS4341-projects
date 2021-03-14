@@ -262,6 +262,28 @@ def boom(wrld):
     return False
 
 
+# param: wrld
+# def:
+#   wrld
+# return: evaluation value
+def eval(sens, wrld):
+    c = next(iter(wrld.characters.values()))
+    c = c[0]
+
+    if len(wrld.monsters.values()) == 0: return 0
+    mlist = next(iter(wrld.monsters.values()))
+    score = 0
+    for m in mlist:
+        distx = abs(c.x - m.x)
+        disty = abs(c.y - m.y)
+        if distx <= 2 and disty <= 2:
+            if distx <= 1 and disty <= 1:
+                score -= 100000
+            score -= 10000
+        score -= sens / (distx+disty)**2
+    return score
+
+
 def neighbors(wrld, curr):
     neighbors = [curr]
 
