@@ -8,7 +8,7 @@ from game import Game
 
 # TODO This is your code!
 sys.path.insert(1, '../group13')
-from expecti_max_AI import AI
+from stupid_AI import AI
 
 
 # Create the game

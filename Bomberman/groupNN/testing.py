@@ -6,15 +6,16 @@ from entity import CharacterEntity, BombEntity, MonsterEntity
 from colorama import Fore, Back
 from events import Event
 from game import Game
+import random
 
 
 
 from monsters.stupid_monster import StupidMonster
 from monsters.selfpreserving_monster import SelfPreservingMonster
-from expecti_max_AI import AI
+from ai import AI
 class training:
     def __init__(self):
-        self.EPISODES = 25
+        self.EPISODES = 10
 
 
 
@@ -25,22 +26,22 @@ class training:
             # print number of the current episode to keep track of them
             print(episode)
             # create and initialize a game
+            random.seed(episode)
             g = Game.fromfile('scenario1/map.txt', '../bomberman/sprites/')
-            g.add_monster(StupidMonster("stupid",  # name
-                                        "S",  # avatar
-                                        3, 5,  # position
-                                        ))
             g.add_monster(SelfPreservingMonster("aggressive",  # name
                                                 "A",  # avatar
                                                 3, 13,  # position
                                                 2  # detection range
                                                 ))
 
+
+
             # TODO Add your character
             g.add_character(AI("Chut",  # name
                                "C",  # avatar
-                               0, 0  # position
+                               0, 0, 800  # position
                                ))
+
             g.go(1)
 
 Q = training()

@@ -1,11 +1,14 @@
-import heapq
-import math
+import sys
+sys.path.insert(0, '../bomberman')
+# Import necessary stuff
+from entity import CharacterEntity
+from colorama import Fore, Back
 from queue import PriorityQueue
-from math import sqrt
-
+import math
+from colorama import Fore, Back
 # Pythagorean distance.
 def Distance(a, b):
-    return sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
+    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
 # absolute distance between tuples
 def distance( a, b):
@@ -14,6 +17,12 @@ def distance( a, b):
     d = abs(x1 - x2) + abs(y1 - y2)
 
     return d
+
+def distance2( x, y):
+		return abs(x[0] - y[0]) + abs(x[1] - y[1])
+
+
+
 
 # distance bettween agent and monster
 def monster_distance( ai, mo):
@@ -89,6 +98,57 @@ def Astar(wrld, start, dest):
     path.append(start)
     path.reverse()
     return path
+
+# param: start is a start node as tuple (x, y)
+#        goal is a goal node as tuple (x, y)
+#        wrld is the current world
+# return: the best next node towards exit
+def aStar(start, goal, wrld):
+    frontier = PriorityQueue()
+    frontier.put(start, 0)
+    came_from = {}
+    cost_so_far = {}
+    came_from[start] = None
+    cost_so_far[start] = 0
+
+    while not frontier.empty():
+        current = frontier.get()
+
+        if current == goal:
+            break
+
+        for next in eCell(current, wrld):
+            new_cost = cost_so_far[current] + 1  # cost from one node to its neighbor is 1
+            if next not in cost_so_far or new_cost < cost_so_far[next]:
+                cost_so_far[next] = new_cost
+                priority = new_cost +distance(goal, next)
+                frontier.put(next, priority)
+                came_from[next] = current
+
+    min =math.inf
+    # search if we can reach goal
+    for next in came_from:
+        dis_to_goal = distance(next, goal)
+        if dis_to_goal < min:
+            min = dis_to_goal
+            min_to_exit = next
+    if next == goal:
+        # we can reach goal
+        while came_from[next] is not None:
+            # set_cell_color(next[0], next[1], Fore.RED + Back.RED)
+            if came_from[next] == start:
+                return next, "has path to exit"  # next move from start to in the A* path
+            next = came_from[next]
+
+    while came_from[min_to_exit] is not None:
+        # set_cell_color(min_to_exit[0], min_to_exit[1], Fore.RED + Back.RED)
+        if came_from[min_to_exit] == start:
+            return min_to_exit, "no path to exit"  # next move from start to in the A* path
+        min_to_exit = came_from[min_to_exit]
+
+    # goal can not be reached
+    # return a move that get close to the goal
+    return None
 
 
 
@@ -175,6 +235,25 @@ def neighbors2( wrld, x, y):
 
     return cells
 
+def eCell( node, wrld):
+    # List of empty cells
+    cells = []
+    # Go through neighboring cells
+    for dx in [-1, 0, 1]:
+        # Avoid out-of-bounds access
+        if (node[0] + dx >= 0) and (node[0] + dx < wrld.width()):
+            for dy in [-1, 0, 1]:
+                # Avoid out-of-bounds access
+                if (node[1] + dy >= 0) and (node[1] + dy < wrld.height()):
+                    # Is this cell safe?
+                    if wrld.exit_at(node[0] + dx, node[1] + dy) or wrld.empty_at(node[0] + dx, node[1] + dy):
+                        # Yes
+                        if not (dx is 0 and dy is 0):
+                            cells.append((node[0] + dx, node[1] + dy))
+    # All done
+    return cells
+
+
 def boom(wrld):
     for x in range(wrld.width()):
         for y in range(wrld.height()):
@@ -209,19 +288,7 @@ def isEmpty( x, y, wrld):
                     empty += 1
     return empty
 
-# return a list of neighbors that are valid moves and don't kill you
-def isEmpty2(f,x,y, wrld,loc):
-    cells = []
-    for dx in [-1, 0, 1]:
-        if (x + dx >= 0) and (x + dx < wrld.width()):
-            for dy in [-1, 0, 1]:
-                # Avoid out-of-bounds access
-                if ((y + dy >= 0) and (y + dy < wrld.height())):
-                    # Is this cell walkable?
-                    if not wrld.wall_at(x + dx, y + dy) and not exp(f,x + dx, y + dy,loc) and not wrld.monsters_at(x + dx, y + dy) and not wrld.explosion_at(x + dx, y + dy):
-                        cells.append((dx, dy))
-                        # All done
-    return cells
+
 
 # return true if a monster is present within a certain radius of a location
 def isMon(wrld, x, y, r):
@@ -248,25 +315,3 @@ def monCoor( wrld, x, y, radius):
                     if wrld.monsters_at(x + dx, y + dy):
                         return (x + dx, y + dy)
 
-
-class PriorityQueue():
-    def __init__(self):
-        self.queue = []
-
-
-    def empty(self):
-        if self.size() != 0:
-            return False
-        else:
-            return True
-
-    def size(self):
-        return len(self.queue)
-
-    def put(self, data, priority):
-        self.queue.append((priority, data))
-        self.queue.sort()
-
-    def get(self):
-        if not self.empty():
-            return self.queue.pop(0)

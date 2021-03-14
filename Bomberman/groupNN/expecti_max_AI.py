@@ -84,10 +84,10 @@ class AI(CharacterEntity):
 
 
         if bomb_distance(x, y, wrld) > 0:
-            reward -= (8 / bomb_distance(x, y, wrld)) * 1000000
+            reward -= (10 / bomb_distance(x, y, wrld)) * 1000000
         if wrld.bomb_at(x, y) is not None:
             if wrld.bomb_at(x, y).timer <= 5:
-                reward -= 10000
+                reward -= 100000
 
         if wrld.exit_at(x, y):
 
