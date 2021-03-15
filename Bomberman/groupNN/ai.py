@@ -15,9 +15,7 @@ class AI(CharacterEntity):
 
     def __init__(self, name, avatar, x, y, d):
         CharacterEntity.__init__(self, name, avatar, x, y)
-        # d is distance to monster ,higher means stay further away from a monster near u
-
-        self.sensitivity = d
+        self.sensitivity = d   # d is distance to monster ,higher means stay further away from a monster near u
 
     def expectimax(self, wrld, events, depth):
 
@@ -34,14 +32,14 @@ class AI(CharacterEntity):
             # if we reach the terminal nodes
             return eval(self.sensitivity,wrld)
 
-        expect_values = []
-        c = next(iter(wrld.characters.values()))  # get the character position in the wrld
+        values_array = []
+        c = next(iter(wrld.characters.values()))  
         c = c[0]
 
         monster_array = wrld.monsters.values()
-        noMonster = 0
+        monster_num = 0
         if len(monster_array) == 0:
-            noMonster = 1
+            monster_num = 1
         elif len(monster_array) == 1:
             m = next(iter(monster_array))[0]
         else:
@@ -52,65 +50,50 @@ class AI(CharacterEntity):
             else:
                 m = m1
 
-        # Go through the possible 9-moves of the character
-        # Loop through delta x
+        # go through the possible moves of the character
+        
         for dx_c in [-1, 0, 1]:
-            # Avoid out-of-bound indexing
-            if (c.x + dx_c >= 0) and (c.x + dx_c < wrld.width()):
-                # Loop through delta y
+            if (c.x + dx_c >= 0) and (c.x + dx_c < wrld.width()):  #   out-of-bound indexing
                 for dy_c in [-1, 0, 1]:
-                    # Avoid out-of-bound indexing
-                    if (c.y + dy_c >= 0) and (c.y + dy_c < wrld.height()):
-                        # No need to check impossible moves
-                        if not wrld.wall_at(c.x + dx_c, c.y + dy_c):
-                            # Set move in wrld
+                    if (c.y + dy_c >= 0) and (c.y + dy_c < wrld.height()):  # out-of-bound indexing
+                        if not wrld.wall_at(c.x + dx_c, c.y + dy_c):  # check to make move in our wrld
                             c.move(dx_c, dy_c)
-                            if noMonster:
+                            if monster_num:
                                 (new_wrld, new_events) = wrld.next()
-                                expect = self.expectimax(new_wrld, new_events, depth + 1)
-                                expect_values.append(expect)
+                                action = self.expectimax(new_wrld, new_events, depth + 1)
+                                values_array.append(action)
                             else:
                                 n = 0  # number of options for monster actions
                                 sum_v = 0  # sum of all monster actions value
 
-                                # Go through the possible 8-moves of the monster
-                                # Loop through delta x
-                                for dx_m in [-1, 0, 1]:
-                                    # Avoid out-of-bound indexing
-                                    if (m.x + dx_m >= 0) and (m.x + dx_m < wrld.width()):
-                                        # Loop through delta y
+                                for dx_m in [-1, 0, 1]:  # go through the possible moves of the monster
+                                    if (m.x + dx_m >= 0) and (m.x + dx_m < wrld.width()):  # out-of-bound check
                                         for dy_m in [-1, 0, 1]:
-                                            # Make sure the monster is moving
                                             if (dx_m != 0) or (dy_m != 0):
-                                                # Avoid out-of-bound indexing
                                                 if (m.y + dy_m >= 0) and (m.y + dy_m < wrld.height()):
-                                                    # No need to check impossible moves
                                                     if not wrld.wall_at(m.x + dx_m, m.y + dy_m):
-                                                        # Set move in wrld
                                                         m.move(dx_m, dy_m)
-                                                        # Get new world
                                                         (new_wrld, new_events) = wrld.next()
-                                                        # do something with new world and events
                                                         n += 1  # number of options for monster movements
                                                         sum_v += self.expectimax(new_wrld, new_events, depth + 1)
-                                expect_values.append(sum_v / n)
-        v = max(expect_values)
+                                values_array.append(sum_v / n)
+        v = max(values_array)
         return v
 
 
 
 
-    def expectimax_action(self, wrld, depth):
+    def expectimax_search(self, wrld, depth):
 
         action = (0, 0)
-        max_v = -math.inf
+        max_value = -math.inf
 
-        c = next(iter(wrld.characters.values()))  # get the character position in the wrld
+        c = next(iter(wrld.characters.values())) 
         c = c[0]
         monster_array = wrld.monsters.values()
-        noMonster = 0
+        monster_num = 0
         if len(monster_array) == 0:
-            noMonster = 1
+            monster_num = 1
         elif len(monster_array) == 1:
             m = next(iter(monster_array))[0]
         else:
@@ -121,56 +104,40 @@ class AI(CharacterEntity):
             else:
                 m = m1  # m1 is closer to c
 
-        # Go through the possible 9-moves of the character
-        # Loop through delta x
+        # Go through the possible moves of the character
         for dx_c in [-1, 0, 1]:
-            # Avoid out-of-bound indexing
             if (c.x + dx_c >= 0) and (c.x + dx_c < wrld.width()):
-                # Loop through delta y
                 for dy_c in [-1, 0, 1]:
-                    # Avoid out-of-bound indexing
                     if (c.y + dy_c >= 0) and (c.y + dy_c < wrld.height()):
-                        # No need to check impossible moves
                         if not wrld.wall_at(c.x + dx_c, c.y + dy_c):
-                            # Set move in wrld
                             c.move(dx_c, dy_c)
-                            if noMonster:
+                            if monster_num:
                                 (new_wrld, new_events) = wrld.next()
                                 dist_to_best = distance((c.x + dx_c, c.y + dy_c), self.loc)
                                 expect = self.expectimax(new_wrld, new_events, depth + 1)
                                 expect -= dist_to_best
-                                if expect > max_v:
+                                if expect > max_value:
                                     action = (dx_c, dy_c)
-                                    max_v = expect
+                                    max_value = expect
                             else:
-                                n = 0  # number of options for monster actions
-                                sum_v = 0  # sum of all monster actions value
-
-                                # Go through the possible 8-moves of the monster
-                                # Loop through delta x
-                                for dx_m in [-1, 0, 1]:
+                                n = 0  
+                                sum_v = 0  
+                                for dx_m in [-1, 0, 1]: # Go through the possible moves of the monster
                                     # Avoid out-of-bound indexing
                                     if (m.x + dx_m >= 0) and (m.x + dx_m < wrld.width()):
-                                        # Loop through delta y
                                         for dy_m in [-1, 0, 1]:
-                                            # Make sure the monster is moving
                                             if (dx_m != 0) or (dy_m != 0):
-                                                # Avoid out-of-bound indexing
                                                 if (m.y + dy_m >= 0) and (m.y + dy_m < wrld.height()):
-                                                    # No need to check impossible moves
                                                     if not wrld.wall_at(m.x + dx_m, m.y + dy_m):
-                                                        # Set move in wrld
                                                         m.move(dx_m, dy_m)
-                                                        # Get new world
                                                         (new_wrld, new_events) = wrld.next()
-                                                        # do something with new world and events
-                                                        n += 1  # number of options for monster movements
+                                                        n += 1  
                                                         sum_v += self.expectimax(new_wrld, new_events, depth + 1)
                                 dist_to_best = distance((c.x + dx_c, c.y + dy_c), self.loc)
                                 expect = sum_v / n - dist_to_best
-                                if expect > max_v:
+                                if expect > max_value:
                                     action = (dx_c, dy_c)
-                                    max_v = expect
+                                    max_value = expect
 
         return action
 
@@ -183,20 +150,12 @@ class AI(CharacterEntity):
         # Your code here
 
         path = aStar((self.x, self.y), wrld.exitcell, wrld)
-
-
-        # if a_star_move returns none, there is no way to go closer to exit
         if path is not None:
             self.loc = path[0]
 
-
-        # Place the bomb as soon as I can
+        # place bomb asap
         self.place_bomb()
+        (dx,dy) = self.expectimax_search(wrld, 0)
+        self.move(dx,dy) # Take the move based on expectimax
 
-
-        # Take the move based on expectimax
-        (dx,dy) = self.expectimax_action(wrld, 0)
-
-        self.move(dx,dy)
-
-        return
+        return 0

@@ -27,21 +27,19 @@ class training:
             print(episode)
             # create and initialize a game
             random.seed(episode)
-            g = Game.fromfile('scenario1/map.txt', '../bomberman/sprites/')
-            g.add_monster(SelfPreservingMonster("aggressive",  # name
+            g = Game.fromfile('scenario2/map.txt', '../bomberman/sprites/')
+            g.add_monster(StupidMonster("monster",  # name
+                                        "S",  # avatar
+                                        3, 5,  # position
+                                        ))
+            g.add_monster(SelfPreservingMonster("monster",  # name
                                                 "A",  # avatar
                                                 3, 13,  # position
                                                 2  # detection range
                                                 ))
 
-
-
             # TODO Add your character
-            g.add_character(AI("Chut",  # name
-                               "C",  # avatar
-                               0, 0, 800  # position
-                               ))
-
+            g.add_character(AI("Chut", "C", 0, 0, 800))
             g.go(1)
 
 Q = training()

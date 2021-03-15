@@ -13,7 +13,7 @@ from monsters.selfpreserving_monster import SelfPreservingMonster
 # TODO This is your code!
 random.seed(123) # TODO Change this if you want different random choices
 sys.path.insert(1, '../group13')
-from expecti_max_v2 import AI
+from ai import AI
 
 # Create the game
 
@@ -31,6 +31,6 @@ g.add_monster(SelfPreservingMonster("monster", # name
 
 
 # TODO Add your character
-g.add_character(AI("Chut", "C", 0, 0))
+g.add_character(AI("Chut", "C", 0, 0,800))
 # Run!
 g.go(1)

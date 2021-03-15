@@ -29,7 +29,7 @@ def monster_distance( ai, mo):
     x1, y1 = ai
     x2, y2 = mo
 
-    d = sqrt((abs(x2 - x1) * abs(y2 - y1)) + (abs(x2 - x1) * abs(y2 - y1)))
+    d = math.sqrt((abs(x2 - x1) * abs(y2 - y1)) + (abs(x2 - x1) * abs(y2 - y1)))
     print(d,"distance")
     if (d == 0):
         return 1
@@ -137,13 +137,13 @@ def aStar(start, goal, wrld):
         while came_from[next] is not None:
             # set_cell_color(next[0], next[1], Fore.RED + Back.RED)
             if came_from[next] == start:
-                return next, "has path to exit"  # next move from start to in the A* path
+                return next, "success"  # next move from start to in the A* path
             next = came_from[next]
 
     while came_from[min_to_exit] is not None:
         # set_cell_color(min_to_exit[0], min_to_exit[1], Fore.RED + Back.RED)
         if came_from[min_to_exit] == start:
-            return min_to_exit, "no path to exit"  # next move from start to in the A* path
+            return min_to_exit, "error! no path " # next move from start to in the A* path
         min_to_exit = came_from[min_to_exit]
 
     # goal can not be reached
@@ -248,7 +248,7 @@ def eCell( node, wrld):
                     # Is this cell safe?
                     if wrld.exit_at(node[0] + dx, node[1] + dy) or wrld.empty_at(node[0] + dx, node[1] + dy):
                         # Yes
-                        if not (dx is 0 and dy is 0):
+                        if not (dx == 0 and dy == 0):
                             cells.append((node[0] + dx, node[1] + dy))
     # All done
     return cells

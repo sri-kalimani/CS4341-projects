@@ -10,7 +10,7 @@ from monsters.selfpreserving_monster import SelfPreservingMonster
 
 # TODO This is your code!
 sys.path.insert(1, '../group13')
-from slightly_intelligent_ai import AI
+from sai import AI
 
 # Create the game
 random.seed(6) # TODO Change this if you want different random choices
@@ -24,7 +24,7 @@ g.add_monster(SelfPreservingMonster("aggressive", # name
 # TODO Add your character
 g.add_character(AI("Chut", # name
                               "C",  # avatar
-                              0, 0  # position
+                              0, 0,800 # position
 ))
 
 # Run!
