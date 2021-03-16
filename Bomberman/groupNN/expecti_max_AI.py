@@ -91,10 +91,10 @@ class AI(CharacterEntity):
 
         if wrld.exit_at(x, y):
 
-            reward += 10000000000000000
+            reward += math.inf
 
         if wrld.explosion_at(x, y) is not None:
-            reward -= 10000000000000000000
+            reward -= math.inf
 
         return reward
 

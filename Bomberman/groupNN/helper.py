@@ -104,6 +104,7 @@ def Astar(wrld, start, dest):
 #        wrld is the current world
 # return: the best next node towards exit
 def aStar(start, goal, wrld):
+    min = math.inf
     frontier = PriorityQueue()
     frontier.put(start, 0)
     came_from = {}
@@ -118,37 +119,35 @@ def aStar(start, goal, wrld):
             break
 
         for next in eCell(current, wrld):
-            new_cost = cost_so_far[current] + 1  # cost from one node to its neighbor is 1
+            new_cost = cost_so_far[current] + 1
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
                 priority = new_cost +distance(goal, next)
                 frontier.put(next, priority)
                 came_from[next] = current
 
-    min =math.inf
-    # search if we can reach goal
-    for next in came_from:
-        dis_to_goal = distance(next, goal)
-        if dis_to_goal < min:
-            min = dis_to_goal
+
+
+    for path in came_from:
+        dis_to_exit = distance(path, goal)
+        if dis_to_exit < min:
+            min = dis_to_exit
             min_to_exit = next
-    if next == goal:
-        # we can reach goal
-        while came_from[next] is not None:
-            # set_cell_color(next[0], next[1], Fore.RED + Back.RED)
-            if came_from[next] == start:
-                return next, "success"  # next move from start to in the A* path
-            next = came_from[next]
+    if path == goal:
+        while came_from[path] is not None:
+            if came_from[path] == start:
+                print(came_from,"pathhh")
+                return path, "success"  # next move from start to in the A* path
+            path = came_from[path]
 
-    while came_from[min_to_exit] is not None:
-        # set_cell_color(min_to_exit[0], min_to_exit[1], Fore.RED + Back.RED)
-        if came_from[min_to_exit] == start:
-            return min_to_exit, "error! no path " # next move from start to in the A* path
-        min_to_exit = came_from[min_to_exit]
 
-    # goal can not be reached
-    # return a move that get close to the goal
-    return None
+    # while came_from[min_to_exit] is not None:
+    #     # set_cell_color(min_to_exit[0], min_to_exit[1], Fore.RED + Back.RED)
+    #     if came_from[min_to_exit] == start:
+    #         return min_to_exit, "error! no path " # next move from start to in the A* path
+    #     min_to_exit = came_from[min_to_exit]
+
+    # return None
 
 
 
@@ -236,18 +235,12 @@ def neighbors2( wrld, x, y):
     return cells
 
 def eCell( node, wrld):
-    # List of empty cells
     cells = []
-    # Go through neighboring cells
     for dx in [-1, 0, 1]:
-        # Avoid out-of-bounds access
         if (node[0] + dx >= 0) and (node[0] + dx < wrld.width()):
             for dy in [-1, 0, 1]:
-                # Avoid out-of-bounds access
                 if (node[1] + dy >= 0) and (node[1] + dy < wrld.height()):
-                    # Is this cell safe?
                     if wrld.exit_at(node[0] + dx, node[1] + dy) or wrld.empty_at(node[0] + dx, node[1] + dy):
-                        # Yes
                         if not (dx == 0 and dy == 0):
                             cells.append((node[0] + dx, node[1] + dy))
     # All done

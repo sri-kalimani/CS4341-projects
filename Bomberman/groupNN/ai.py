@@ -15,22 +15,21 @@ class AI(CharacterEntity):
 
     def __init__(self, name, avatar, x, y, d):
         CharacterEntity.__init__(self, name, avatar, x, y)
-        self.sensitivity = d   # d is distance to monster ,higher means stay further away from a monster near u
+        self.focus = d   # d is distance to monster ,higher means stay further away from a monster near u
 
     def expectimax(self, wrld, events, depth):
 
         for event in events:
             if event.tpe == event.CHARACTER_FOUND_EXIT:
-                # character is winning so best evaluation
-                return math.inf
+
+                return math.inf # won
 
             elif event.tpe == event.BOMB_HIT_CHARACTER or event.tpe == event.CHARACTER_KILLED_BY_MONSTER:
-                # character is dead so worst evaluation
-                return -math.inf
+
+                return -math.inf # lost
 
         if depth >= 2:
-            # if we reach the terminal nodes
-            return eval(self.sensitivity,wrld)
+            return eval(self.focus,wrld)  # if we reach the terminal nodes
 
         values_array = []
         c = next(iter(wrld.characters.values()))  
